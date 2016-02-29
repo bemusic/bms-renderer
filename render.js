@@ -3,7 +3,10 @@
 
 const argv = require('yargs')
   .usage('Usage: $0 <input.bms> <output.wav>')
-  .demand(2)
+  .boolean('info')
+  .describe('info', 'Only prints the song info.')
+  .demand(2, 2)
+  .version()
   .argv
 
 const childProcess = require('child_process')
@@ -120,7 +123,9 @@ function canUseBmsampler () {
   const filepath = argv._[0]
   const outfilepath = argv._[1]
   const song = getNotes(filepath)
-  const render = canUseBmsampler() ? renderers.bmsampler : renderers.ffi
   console.log(JSON.stringify(song.info, null, 2))
-  render(song, outfilepath)
+  if (!argv.info) {
+    const render = canUseBmsampler() ? renderers.bmsampler : renderers.ffi
+    render(song, outfilepath)
+  }
 }
