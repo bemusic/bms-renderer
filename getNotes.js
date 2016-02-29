@@ -1,12 +1,12 @@
+'use strict'
 
-var fs = require('fs')
-var bms = require('bms')
-var path = require('path')
-var _ = require('lodash')
-
+const fs = require('fs')
+const NotechartLoader = require('bemuse-notechart/loader').NotechartLoader
+const path = require('path')
+const _ = require('lodash')
+const Promise = require('bluebird')
 
 function cut (sortedTimes) {
-
   var last = { }
   sortedTimes = _.cloneDeep(sortedTimes)
 
@@ -26,24 +26,22 @@ function cut (sortedTimes) {
 }
 
 
-function getNotes (filepath) {
+const getNotes = Promise.coroutine(function* (filepath) {
 
-  var buffer = fs.readFileSync(filepath)
-  var src = bms.Reader.read(buffer)
-  var result = bms.Compiler.compile(src)
-  var chart = result.chart
-  var timing = bms.Timing.fromBMSChart(chart)
-  var notes = bms.Notes.fromBMSChart(chart)
-  var info = bms.SongInfo.fromBMSChart(chart)
-  var keys = { }
-  var times = (_(notes.all())
-    .map(function(note) {
-      return {
-        time: timing.beatToSeconds(note.beat),
-        src: lookup(note.keysound),
-        keysound: note.keysound,
-      }
-    })
+  const buffer = fs.readFileSync(filepath)
+  const loader = new NotechartLoader()
+  const notechart = yield loader.load(buffer, { name: filepath }, { })
+  const notes = notechart.notes.concat(notechart.autos)
+  const info = notechart.songInfo
+
+  const keys = { }
+  const times = (_(notes)
+    .filter(note => !note.keysoundStart)
+    .map(note => ({
+      time: note.time,
+      src: lookup(note.keysound),
+      keysound: note.keysound,
+    }))
     .sortBy('time')
     .thru(cut)
     .value()
@@ -62,7 +60,7 @@ function getNotes (filepath) {
   }
 
   function find(k) {
-    var wav = chart.headers.get('wav' + k)
+    var wav = notechart.keysounds[k.toLowerCase()]
     if (!wav) return null
     wav = path.resolve(filepath, '..', wav)
     if (fs.existsSync(wav)) return wav
@@ -72,6 +70,6 @@ function getNotes (filepath) {
     if (fs.existsSync(wav)) return wav
     return null
   }
-}
+})
 
 module.exports = getNotes

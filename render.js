@@ -9,10 +9,13 @@ const argv = require('yargs')
   .version()
   .argv
 
+require('babel-polyfill')
+
 const childProcess = require('child_process')
 const getNotes = require('./getNotes')
 const _ = require('lodash')
 const satisfies = require('semver').satisfies
+const Promise = require('bluebird')
 
 const renderers = {
   ffi (song, outfilepath) {
@@ -122,10 +125,12 @@ function canUseBmsampler () {
 {
   const filepath = argv._[0]
   const outfilepath = argv._[1]
-  const song = getNotes(filepath)
-  console.log(JSON.stringify(song.info, null, 2))
-  if (!argv.info) {
-    const render = canUseBmsampler() ? renderers.bmsampler : renderers.ffi
-    render(song, outfilepath)
-  }
+  Promise.coroutine(function* () {
+    const song = yield getNotes(filepath)
+    console.log(JSON.stringify(song.info, null, 2))
+    if (!argv.info) {
+      const render = canUseBmsampler() ? renderers.bmsampler : renderers.ffi
+      render(song, outfilepath)
+    }
+  })().done()
 }
