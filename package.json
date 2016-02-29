@@ -17,7 +17,9 @@
     "lodash": "^3.10.1",
     "minimist": "^1.2.0",
     "ref": "^1.1.1",
-    "ref-struct": "^1.0.2"
+    "ref-struct": "^1.0.2",
+    "semver": "^5.1.0",
+    "yargs": "^4.2.0"
   },
   "devDependencies": {
     "chai": "^3.2.0",
