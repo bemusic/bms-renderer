@@ -64,6 +64,8 @@ const getNotes = Promise.coroutine(function* (filepath) {
     if (!wav) return null
     wav = path.resolve(filepath, '..', wav)
     if (fs.existsSync(wav)) return wav
+    wav = wav.replace(/\.\w\w\w$/, '.wav')
+    if (fs.existsSync(wav)) return wav
     wav = wav.replace(/\.\w\w\w$/, '.ogg')
     if (fs.existsSync(wav)) return wav
     wav = wav.replace(/\.\w\w\w$/, '.mp3')
