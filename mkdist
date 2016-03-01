@@ -1,0 +1,9 @@
+#!/bin/bash -e
+TARBALL=$(npm pack)
+VERSION=$(node version.js)
+rm -rf "dist/bms-renderer-$VERSION"
+mkdir -p "dist/bms-renderer-$VERSION"
+tar xvzf "$TARBALL" -C "dist/bms-renderer-$VERSION" --strip-components=1
+rm "$TARBALL"
+(cd "dist/bms-renderer-$VERSION" && npm install --production --no-optional)
+(cd dist && zip -r "$CIRCLE_ARTIFACTS/bms-renderer-$VERSION.zip" "bms-renderer-$VERSION")
