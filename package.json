@@ -1,10 +1,10 @@
 {
   "name": "bms-renderer",
-  "version": "1.0.0",
-  "description": "Renders BMS to 32bit float wav file (like BMx2WAV)",
+  "version": "2.0.0-beta",
+  "description": "Renders BMS and bmson files to 32bit float wav file (like BMx2WAV)",
   "main": "render.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "bin": {
     "bms-renderer": "./render.js"
