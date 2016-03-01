@@ -26,6 +26,21 @@ function cut (sortedTimes) {
 }
 
 
+function getHash (times) {
+
+  const out = { }
+  for (const note of times) {
+    if (note.src) {
+      const frame = Math.round(note.time * 60)
+      out[note.src + ':' + frame] = true
+    }
+  }
+  const data = _.sortBy(Object.keys(out)).join('\n')
+  fs.writeFileSync('/tmp/d' + Date.now() + '.nfo', data)
+  return require('crypto').createHash('md5').update(data).digest('hex')
+}
+
+
 const getNotes = Promise.coroutine(function* (filepath) {
 
   const buffer = fs.readFileSync(filepath)
@@ -46,10 +61,13 @@ const getNotes = Promise.coroutine(function* (filepath) {
     .thru(cut)
     .value()
   )
+  const xinfo = {
+    sequenceHash: getHash(times)
+  }
 
   return {
     path: filepath,
-    info: info,
+    info: Object.assign(xinfo, info),
     data: times,
     keysounds: _(keys).values().map('result').compact().value()
   }
