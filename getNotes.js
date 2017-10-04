@@ -80,7 +80,7 @@ const getNotes = Promise.coroutine(function* (filepath) {
   function find(k) {
     var wav = notechart.keysounds[k.toLowerCase()]
     if (!wav) return null
-    wav = path.resolve(filepath, '..', wav)
+    wav = path.normalize(path.resolve(filepath, '..', wav)).replace(/[\/\\¥]/g, path.sep)
     if (fs.existsSync(wav)) return wav
     wav = wav.replace(/\.\w\w\w$/, '.wav')
     if (fs.existsSync(wav)) return wav
