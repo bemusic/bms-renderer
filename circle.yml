@@ -1,11 +1,11 @@
 machine:
   node:
-    version: 5
+    version: 8
 test:
   pre:
     - npm link
   override:
     - npm test
-    - bms-renderer fixtures/cut.bms /tmp/cut.wav
+    - bms-renderer fixtures/cut.bms $CIRCLE_ARTIFACTS/cut.wav
   post:
     - ./mkdist
