@@ -2,9 +2,19 @@
 'use strict'
 
 const argv = require('yargs')
-  .usage('Usage: $0 <input.bms> <output.wav>')
+  .usage('Usage: \n$0 <input.bms> <output.wav>\n$0 [-s] [start_time] [-l] [length] <input.bms> <output.wav>')
+
+  .option('start', { alias: 's', type: "number" })
+  .default('start', 0)
+  .describe('start', 'Start time to render in seconds. Omit to render from the beginning.')
+
+  .option('length', { alias: 'l', type: "number" })
+  .default('length', 0)
+  .describe('length', 'Length to render in seconds. Omit to render to the end.')
+
   .boolean('info')
   .describe('info', 'Only prints the song info.')
+
   .demand(2, 2)
   .version()
   .argv
@@ -44,7 +54,10 @@ const renderers = {
     }).filter('sound').value()
     process.stderr.write('Number of valid notes: ' + validNotes.length + '\n')
 
-    var last = _(validNotes).map(function (note) {
+    const shiftStartFrame = frameForTime(argv.start);
+    const lengthFrame = frameForTime(argv.length);
+
+    var endSongFrame = _(validNotes).map(function (note) {
       var length = note.sound.frames
       return frameForTime(note.time) + length
     }).max()
@@ -53,7 +66,11 @@ const renderers = {
       return frameForTime(note.time)
     }).min()
 
-    var frames = last - skip
+    const startFrame = Math.min(skip + shiftStartFrame, endSongFrame);
+    const endFrame = argv.length == 0 ? endSongFrame : Math.min(startFrame + lengthFrame, endSongFrame);
+
+    const frames = endFrame - startFrame;
+    
     process.stderr.write('Total song length: ' + (frames / 44100) + '\n')
 
     process.stderr.write('Writing notes...' + '\n')
@@ -70,10 +87,19 @@ const renderers = {
       }
 
       var soundBuffer = sound.buffer
-      var length = Math.min(soundBuffer.length, framesToCopy * 2 * 4)
-      for (var i = 0; i < length; i += 4) {
-        var position = offset + i
-        buffer.writeFloatLE(buffer.readFloatLE(position) + soundBuffer.readFloatLE(i), position)
+      const soundBufferBeginReading = Math.max(0, startFrame - skip - start) * 2 * 4
+      const length = Math.min(soundBuffer.length - soundBufferBeginReading, framesToCopy * 2 * 4)
+
+      for (var i = soundBufferBeginReading; i < (soundBufferBeginReading + length); i += 4) {
+        const position = (offset + i) - ((shiftStartFrame) * 2 * 4)
+
+        if (position > buffer.length - 4) {
+          break;
+        }
+
+        const floatFile = buffer.readFloatLE(position)
+        const floatSound = soundBuffer.readFloatLE(i)
+        buffer.writeFloatLE(floatFile + floatSound, position)
       }
       process.stderr.write('.')
     })
@@ -125,11 +151,12 @@ function canUseBmsampler () {
 {
   const filepath = argv._[0]
   const outfilepath = argv._[1]
+  const partialRendering = (argv.start != 0 || argv.length != 0)
   Promise.coroutine(function* () {
     const song = yield getNotes(filepath)
     console.log(JSON.stringify(song.info, null, 2))
     if (!argv.info) {
-      const render = canUseBmsampler() ? renderers.bmsampler : renderers.ffi
+      const render = (canUseBmsampler() && !partialRendering) ? renderers.bmsampler : renderers.ffi
       render(song, outfilepath)
     }
   })().done()
