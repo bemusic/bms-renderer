@@ -6,6 +6,7 @@ jobs:
     environment:
       CIRCLE_ARTIFACTS: /tmp/circle-artifacts
     steps:
+      - add_ssh_key
       - checkout
       - run: npm link
       - run: npm test
