@@ -8,8 +8,6 @@ const argv = require('yargs')
   .demand(2, 2)
   .version().argv
 
-require('babel-polyfill')
-
 const childProcess = require('child_process')
 const getNotes = require('./getNotes')
 const _ = require('lodash')
