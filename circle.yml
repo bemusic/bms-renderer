@@ -13,7 +13,7 @@ jobs:
       - run: npm test
       - run: sudo npm link
       - run: mkdir -p $CIRCLE_ARTIFACTS
-      - run: bms-renderer fixtures/cut.bms /tmp/cut.wav
+      - run: bms-renderer fixtures/cut.bms $CIRCLE_ARTIFACTS/cut.wav
       - run: ./mkdist
       - store_artifacts:
           path: /tmp/circle-artifacts
