@@ -1,11 +1,16 @@
-machine:
-  node:
-    version: 5
-test:
-  pre:
-    - npm link
-  override:
-    - npm test
-    - bms-renderer fixtures/cut.bms /tmp/cut.wav
-  post:
-    - ./mkdist
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:12.9.1
+    env:
+      CIRCLE_ARTIFACTS: /tmp/circle-artifacts
+    steps:
+      - checkout
+      - run: npm link
+      - run: npm test
+      - run: bms-renderer fixtures/cut.bms /tmp/cut.wav
+      - run: ./mkdist
+      - store_artifacts:
+          path: /tmp/circle-artifacts
+          destination: artifacts
