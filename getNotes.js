@@ -1,7 +1,7 @@
 'use strict'
 
 const fs = require('fs')
-const NotechartLoader = require('bemuse-notechart/loader').NotechartLoader
+const NotechartLoader = require('bemuse-notechart/lib/loader').NotechartLoader
 const path = require('path')
 const _ = require('lodash')
 const Promise = require('bluebird')
