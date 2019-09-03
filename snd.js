@@ -1,8 +1,6 @@
-
-var ref = require('ref')
-var ffi = require('ffi')
-var fs  = require('fs')
-var Struct = require('ref-struct')
+var ref = require('ref-napi')
+var ffi = require('ffi-napi')
+var Struct = require('ref-struct-di')(ref)
 
 var SFM_READ = 0x10
 var SFM_WRITE = 0x20
@@ -17,26 +15,25 @@ var SF_INFO = Struct({
   channels: 'int32',
   format: 'int32',
   sections: 'int32',
-  seekable: 'int32',
+  seekable: 'int32'
 })
 var SF_INFOPtr = ref.refType(SF_INFO)
 var floatPtr = ref.refType(ref.types.float)
 
 var libsndfile = ffi.Library('libsndfile', {
-  'sf_open': [ SNDFILEPtr, [ 'string', 'int', SF_INFOPtr ] ],
-  'sf_close': [ 'int', [ SNDFILEPtr ] ],
-  'sf_readf_float': [ 'long', [ SNDFILEPtr, floatPtr, 'long' ] ],
-  'sf_writef_float': [ 'long', [ SNDFILEPtr, floatPtr, 'long' ] ],
+  sf_open: [SNDFILEPtr, ['string', 'int', SF_INFOPtr]],
+  sf_close: ['int', [SNDFILEPtr]],
+  sf_readf_float: ['long', [SNDFILEPtr, floatPtr, 'long']],
+  sf_writef_float: ['long', [SNDFILEPtr, floatPtr, 'long']]
 })
 
-exports.read = function (path) {
-
-  var info = new SF_INFO
+exports.read = function(path) {
+  var info = new SF_INFO()
   info.format = 0
   var ptr = libsndfile.sf_open(path, SFM_READ, info.ref())
   if (ptr.isNull()) throw new Error('Cannot load ' + path)
 
-  var sound = { }
+  var sound = {}
   sound.frames = info.frames
   sound.samplerate = info.samplerate
   sound.channels = info.channels
@@ -50,9 +47,8 @@ exports.read = function (path) {
   return sound
 }
 
-exports.write = function (path, sound) {
-
-  var info = new SF_INFO
+exports.write = function(path, sound) {
+  var info = new SF_INFO()
   info.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT
   info.samplerate = sound.samplerate
   info.channels = sound.channels

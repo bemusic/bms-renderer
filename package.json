@@ -1,6 +1,6 @@
 {
   "name": "bms-renderer",
-  "version": "2.0.0-beta",
+  "version": "3.0.0-0",
   "description": "Renders BMS and bmson files to 32bit float wav file (like BMx2WAV)",
   "main": "render.js",
   "scripts": {
@@ -12,15 +12,13 @@
   "author": "Thai Pangsakulyanont <org.yi.dttvb@gmail.com> (http://dt.in.th/)",
   "license": "MIT",
   "optionalDependencies": {
-    "ffi": "^2.0.0",
-    "ref": "^1.1.1",
-    "ref-struct": "^1.0.2"
+    "ffi-napi": "^2.4.5",
+    "ref-napi": "^1.4.2",
+    "ref-struct-di": "^1.1.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.5.0",
-    "bemuse-notechart": "^1.0.11",
+    "bemuse-notechart": "^45.1.0",
     "bluebird": "^3.3.3",
-    "bms": "^2.0.0",
     "lodash": "^3.10.1",
     "minimist": "^1.2.0",
     "semver": "^5.1.0",
