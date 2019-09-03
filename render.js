@@ -63,7 +63,7 @@ const renderers = {
     process.stderr.write('Total song length: ' + frames / 44100 + '\n')
 
     process.stderr.write('Writing notes...' + '\n')
-    var buffer = new Buffer(frames * 2 * 4)
+    var buffer = Buffer.alloc(frames * 2 * 4)
     _.each(validNotes, function(note) {
       var sound = note.sound
       var start = frameForTime(note.time) - skip

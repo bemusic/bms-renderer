@@ -39,7 +39,7 @@ exports.read = function(path) {
   sound.channels = info.channels
 
   var size = 4 * sound.frames * sound.channels
-  var buffer = new Buffer(size)
+  var buffer = Buffer.alloc(size)
   libsndfile.sf_readf_float(ptr, buffer, sound.frames)
   sound.buffer = buffer
   libsndfile.sf_close(ptr)
