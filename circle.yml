@@ -9,8 +9,9 @@ jobs:
       - add_ssh_keys
       - checkout
       - run: sudo apt-get install -y libsndfile1
-      - run: sudo npm link
+      - run: npm install
       - run: npm test
+      - run: sudo npm link
       - run: bms-renderer fixtures/cut.bms /tmp/cut.wav
       - run: ./mkdist
       - store_artifacts:
