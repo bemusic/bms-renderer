@@ -3,12 +3,13 @@ jobs:
   build:
     docker:
       - image: circleci/node:12.9.1
-    env:
+    environment:
       CIRCLE_ARTIFACTS: /tmp/circle-artifacts
     steps:
       - checkout
       - run: npm link
       - run: npm test
+      - run:
       - run: bms-renderer fixtures/cut.bms /tmp/cut.wav
       - run: ./mkdist
       - store_artifacts:
