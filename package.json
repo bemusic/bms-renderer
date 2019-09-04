@@ -1,6 +1,6 @@
 {
   "name": "bms-renderer",
-  "version": "3.0.0-0",
+  "version": "3.0.0",
   "description": "Renders BMS and bmson files to 32bit float wav file (like BMx2WAV)",
   "main": "render.js",
   "scripts": {
