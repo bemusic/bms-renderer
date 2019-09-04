@@ -3,6 +3,7 @@
 
 const argv = require('yargs')
   .usage('Usage: $0 <input.bms> <output.wav>')
+  .boolean('full')
   .boolean('info')
   .describe('info', 'Only prints the song info.')
   .demand(2, 2)
@@ -51,11 +52,13 @@ const renderers = {
       })
       .max()
 
-    var skip = _(validNotes)
-      .map(function(note) {
-        return frameForTime(note.time)
-      })
-      .min()
+    var skip = argv.full
+      ? 0
+      : _(validNotes)
+          .map(function(note) {
+            return frameForTime(note.time)
+          })
+          .min()
 
     var frames = last - skip
     process.stderr.write('Total song length: ' + frames / 44100 + '\n')
